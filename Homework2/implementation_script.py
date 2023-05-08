@@ -6,6 +6,10 @@ import numpy as np
 from matplotlib import pyplot as plt
 from sklearn.metrics.pairwise import euclidean_distances
 
+
+import itertools  # for Cartesian product
+
+
 def nonMaxSuprression(img, d=5):
     """
     Given an image set all values to 0 that are not
@@ -121,12 +125,11 @@ def GeneralizedHoughTransform(img, template, angles, scales):
 
         Note the order of these values.
     """
-    # TODO:
-    # for every combination of angles and scales
-    # -rotate and scale template
-    # -compute the correlation
-    # -store results with parameters in a list
-
-    return [(np.zeros_like(img), 0, 1)]
+    result = []
+    for (angle, scale) in itertools.product(angles, scales):
+        modified_template = utils.rotateAndScale(template, angle, scale)
+        corr = correlation(img, modified_template)
+        result.append((corr, angle, scale))
+    return result
 
 
