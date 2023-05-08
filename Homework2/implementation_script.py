@@ -57,11 +57,12 @@ def calcBinaryMask(img, thresh=0.3):
 
     """
 
-    # TODO:
-    # -compute gradients
-    # -threshold gradients
-    # -return binary mask
-    return np.zeros_like(img)
+    grad = utils.calcDirectionalGrad(img)
+    threshold_value = np.max(grad) * thresh
+    binary_mask = abs(grad) > threshold_value
+
+    # print(binary_mask)
+    return binary_mask
 
 
 def correlation(img, template):
@@ -89,9 +90,10 @@ def correlation(img, template):
         an image containing the correlation between image and template gradients.
     """
 
+    img_grad = utils.calcDirectionalGrad(img)
+    template_grad = utils.calcDirectionalGrad(template)
+
     # TODO:
-    # -compute gradient of the image
-    # -compute gradient of the template
     # -copy template gradient into larger frame
     # -apply a circular shift so the center of the original template is in the
     #   upper left corner

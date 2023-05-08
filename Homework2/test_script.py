@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 from sklearn.metrics.pairwise import euclidean_distances
 
-from implementation_script import GeneralizedHoughTransform, nonMaxSuprression
+from implementation_script import GeneralizedHoughTransform, nonMaxSuprression, calcBinaryMask
 
 
 def mainProgram():
@@ -60,9 +60,6 @@ def testGHT():
 
     # Visualize GHT votes
     votes, thetas, s = zip(*ght)
-    # print(votes)
-    # print(thetas)
-    # print(s)
     votes = np.stack(votes).max(0)
     plt.imshow(votes)
     plt.show()
@@ -102,6 +99,15 @@ def testGHT():
 
     print(json.dumps(score))
 
+
+def testBinaryMask():
+    query = cv2.imread("data/query.jpg", cv2.IMREAD_GRAYSCALE)
+    res = calcBinaryMask(query)
+    plt.imshow(res)
+    plt.show()
+
+
 if __name__ == "__main__":
     # mainProgram()
-    testGHT()
+    # testGHT()
+    testBinaryMask()
