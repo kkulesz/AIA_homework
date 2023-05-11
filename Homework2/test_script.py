@@ -109,5 +109,5 @@ def testBinaryMask():
 
 if __name__ == "__main__":
     # mainProgram()
-    # testGHT()
-    testBinaryMask()
+    testGHT()
+    # testBinaryMask()

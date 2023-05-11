@@ -20,7 +20,7 @@ def nonMaxSuprression(img, d=5):
     img : ndarray
         an image
     d : int
-        for each pixels consider the surrounding (2d+1,2d+1)-window
+        for each pixel consider the surrounding (2d+1,2d+1)-window
 
     Returns
     -------
@@ -29,11 +29,19 @@ def nonMaxSuprression(img, d=5):
     """
     rows, cols = img.shape
     result = np.zeros((rows, cols))
-    # TODO
-    # iterate over pixels
-    # iterate over (2d+1,2d+1) neighborhood window
-    # supress non-maxima to 0
-    # store results in new array
+    for i in range(rows):
+        for j in range(cols):
+            # no padding, shrink window at the edges
+            low_y = max(0, i - d)
+            low_x = max(0, j - d)
+            high_y = min(rows, i + d)
+            high_x = min(cols, j + d)
+
+            window = img[low_y:high_y, low_x:high_x]
+
+            max_val = window.max()
+            if img[i, j] == max_val:
+                result[i, j] = max_val
 
     return result
 
