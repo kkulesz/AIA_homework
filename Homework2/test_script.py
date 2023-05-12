@@ -102,8 +102,12 @@ def testGHT():
 
 def testBinaryMask():
     query = cv2.imread("data/query.jpg", cv2.IMREAD_GRAYSCALE)
-    res = calcBinaryMask(query)
-    plt.imshow(res)
+    template = cv2.imread("data/template.jpg", cv2.IMREAD_GRAYSCALE)
+    query_res = calcBinaryMask(query)
+    template_res = calcBinaryMask(template)
+    plt.imshow(query_res)
+    plt.show()
+    plt.imshow(template_res)
     plt.show()
 
 

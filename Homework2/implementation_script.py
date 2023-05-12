@@ -1,11 +1,5 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-import cv2
 import utils
 import numpy as np
-from matplotlib import pyplot as plt
-from sklearn.metrics.pairwise import euclidean_distances
-
 
 import itertools  # for Cartesian product
 
@@ -98,28 +92,52 @@ def correlation(img, template):
         an image containing the correlation between image and template gradients.
     """
 
-    # -compute gradient of the image
+    # (1.1) compute gradient of the image
     img_grad = utils.calcDirectionalGrad(img)
     img_r, img_c = img_grad.shape
-    # -compute gradient of the template
+    # (1.2) and the template
     template_grad = utils.calcDirectionalGrad(template)
     tmp_r, tmp_c = template_grad.shape
 
-    # -copy template gradient into larger frame (pad it with zeros?)
-    template_grad_padded = np.pad(template_grad, ((0, img_r-tmp_r), (0, img_c-tmp_c)), constant_values=0)
+    #################### START directly from function TODOs
+    # # -copy template gradient into larger frame (pad it with zeros?)
+    # T_padded = np.pad(template_grad, ((0, img_r-tmp_r), (0, img_c-tmp_c)), constant_values=0)
+    #
+    # # -apply a circular shift so the center of the original template is in the
+    # #   upper left corner
+    # T_shifted = utils.circularShift(T_padded, tmp_c//2, tmp_r//2)
+    #
+    # # -normalize template
+    # template_sum = np.sum(abs(T_shifted))
+    # T_ready = T_shifted/template_sum
+    #################### END directly from function TODOs
 
-    # -apply a circular shift so the center of the original template is in the
-    #   upper left corner
-    template_grad_padded_shifted = utils.circularShift(template_grad_padded, tmp_c//2, tmp_r//2)
+    #################### START from 46th slide
+    # (2) normalize template gradient
+    template_sum = np.sum(abs(template_grad))
+    O_i = template_grad / template_sum
 
-    # -normalize template
-    template_sum = np.sum(abs(template_grad_padded_shifted))
-    template_grad_padded_shifted_normalized = template_grad_padded_shifted/template_sum
+    # (3.1) calculate binary mask and filter gradients
+    O_b = calcBinaryMask(template)
+    T = O_b * O_i
 
-    # TODO:
-    # -compute correlation
+    # (3.2) coping template into larger scale frame and shifting
+    T_padded = np.pad(T, ((0, img_r - tmp_r), (0, img_c - tmp_c)), constant_values=0)
+    T_ready = utils.circularShift(T_padded, tmp_c // 2, tmp_r // 2)
+    ##################### END 46th slide
 
-    return np.zeros_like(img)
+    # Debug code - to see whether template is correctly shifted (spoiler - it is :)
+    # utils.show(abs(T_ready))
+    # exit()
+
+    # (4) calculate correlation
+    corr = np.real(
+        np.fft.ifft(
+            np.fft.fft(img_grad) * np.fft.fft(T_ready)
+        )
+    )
+
+    return corr
 
 
 def GeneralizedHoughTransform(img, template, angles, scales):
@@ -152,5 +170,3 @@ def GeneralizedHoughTransform(img, template, angles, scales):
         corr = correlation(img, modified_template)
         result.append((corr, angle, scale))
     return result
-
-
