@@ -63,7 +63,6 @@ def calcBinaryMask(img, thresh=0.3):
     threshold_value = np.max(grad) * thresh
     binary_mask = abs(grad) > threshold_value
 
-    # print(binary_mask)
     return binary_mask
 
 
@@ -99,20 +98,7 @@ def correlation(img, template):
     template_grad = utils.calcDirectionalGrad(template)
     tmp_r, tmp_c = template_grad.shape
 
-    #################### START directly from function TODOs
-    # # -copy template gradient into larger frame (pad it with zeros?)
-    # T_padded = np.pad(template_grad, ((0, img_r-tmp_r), (0, img_c-tmp_c)), constant_values=0)
-    #
-    # # -apply a circular shift so the center of the original template is in the
-    # #   upper left corner
-    # T_shifted = utils.circularShift(T_padded, tmp_c//2, tmp_r//2)
-    #
-    # # -normalize template
-    # template_sum = np.sum(abs(T_shifted))
-    # T_ready = T_shifted/template_sum
-    #################### END directly from function TODOs
-
-    #################### START from 46th slide
+    # from 46th slide
     # (2) normalize template gradient
     template_sum = np.sum(abs(template_grad))
     O_i = template_grad / template_sum
@@ -124,7 +110,6 @@ def correlation(img, template):
     # (3.2) coping template into larger scale frame and shifting
     T_padded = np.pad(T, ((0, img_r - tmp_r), (0, img_c - tmp_c)), constant_values=0)
     T_ready = utils.circularShift(T_padded, tmp_c // 2, tmp_r // 2)
-    ##################### END 46th slide
 
     # Debug code - to see whether template is correctly shifted (spoiler - it is :)
     # utils.show(abs(T_ready))
@@ -132,8 +117,8 @@ def correlation(img, template):
 
     # (4) calculate correlation
     corr = np.real(
-        np.fft.ifft(
-            np.fft.fft(img_grad) * np.fft.fft(T_ready)
+        np.fft.ifft2(
+            np.fft.fft2(img_grad) * np.conjugate(np.fft.fft2(T_ready))
         )
     )
 
